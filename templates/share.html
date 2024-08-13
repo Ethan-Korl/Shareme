@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Lobby</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .message-area {
+        border: 1px solid #ced4da;
+        height: 300px;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+    }
+    .message {
+        background-color: #ffffff;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"] {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin: 0;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+    input[type="submit"] {
+        width: 100px;
+        padding: 10px;
+        margin-left: 700px;
+        margin-top: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="message-area" id="messageArea">
+        <!-- Messages will appear here -->
+    </div>
+    <input id="socket-number" placeholder="socket-number" type="number"/>
+    <form action="/share/share-file/" method="POST" id="messageForm" enctype="multipart/form-data">
+        <input name="share_channel_id" value="233"/>
+        {% csrf_token %}
+        <input type="file" name="file" id="fileInput" placeholder="Type your message...">
+        <input type="submit" value="Send">
+    </form>
+</div>
+
+<script>
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        function generateRandomString(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charactersLength);
+            result += characters.charAt(randomIndex);
+        }
+        return result;
+        }
+
+        // document.getElementById('socket-number').oninput = ()
+        // var channel = socket_number.value
+
+        // socket_number.addEventListener('oninput', () => {
+        //     console.log(channel)
+        // })
+
+        // console.log(channel)
+        //##########################################################
+
+        const shareChannelId = generateRandomString(10);
+        console.log(shareChannelId)
+        // Javascript websocket api to initiate the web socker connection
+        // need an endpiont to start the handshake
+        let websocketUrl = ""
+
+        var testing_id = 123454334233
+        console.log(location.protocol)
+        if (location.protocol == "https:"){
+    
+          websocketUrl = `wss://${window.location.host}/ws/socket-server/233/`
+        }else {
+            websocketUrl = `ws://${window.location.host}/ws/socket-server/233/`
+        }
+               
+        console.log(websocketUrl)
+        // use the web socket object to set the chat socket var and pass in the url
+        const socket = new WebSocket(websocketUrl); 
+
+        // now that we have the instance or object we can use the message event to listen for
+        // messages from our backend(sever) this will fire off if our server send a message
+        // from the backend
+        socket.onopen = () => {
+            alert("Connected")
+        }
+
+        socket.onclose = () =>{
+            alert("Disconnected")
+        }
+
+        socket.onmessage = (e) => {
+            let data = JSON.parse(e.data);
+            console.log(data)
+            let filename =  data['file_name']
+            let filesize = data['file_size']
+            let fileurl = data['file_url']
+            appendMessage(filename, fileurl);
+        }
+        //#################################################################
+
+
+        var messageForm = document.getElementById("messageForm");
+        var messageInput = document.getElementById("messageInput");
+        var messageArea = document.getElementById("messageArea");
+
+        // messageForm.addEventListener("submit", function(event) {
+        //     event.preventDefault();
+        //     var fileInput = document.getElementById('fileInput');
+        //     var file = fileInput.files[0];
+        //     if (file) {
+        //         var formData = new FormData();
+        //         formData.append('image', file);
+        //         formData.append('filename', file.name);
+
+        //         socket.send(JSON.stringify({
+        //             'image': file,
+        //             'filename': file.name
+        //         }))
+        //     };
+        // });
+
+        function appendMessage(sender, message) {
+            var messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+            messageElement.innerHTML = "<strong>" + sender + ":</strong> " + message;
+            messageArea.appendChild(messageElement);
+        }
+    });
+</script>
+
+<script>
+
+
+</script>
+</body>
+</html>
