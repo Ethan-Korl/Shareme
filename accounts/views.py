@@ -19,7 +19,7 @@ def signup(request: HttpRequest):
             return render(
                 request,
                 "components/messages/error_message.html",
-                {"message": f"{username} already exists"},
+                {"message": f"{username} taken"},
             )
         else:
             generate_otp = GenerateOtp(username)
@@ -79,6 +79,24 @@ def login(request: HttpRequest):
                 {"message": "user does not exists"},
             )
     return render(request, "front_end/login.html")
+
+
+def check_username(request: HttpRequest):
+    user_repo = CustomUserRepo
+    if request.method == "POST":
+        username = request.POST.get("username")
+        if user_repo.get_user(username):
+            return render(
+                request,
+                "components/messages/error_message.html",
+                {"message": f"{username} taken"},
+            )
+        else:
+            return render(
+                request,
+                "components/messages/info_message.html",
+                {"message": f"{username} available"},
+            )
 
 
 def verify_otp(request: HttpRequest, username):
