@@ -82,6 +82,9 @@ def login(request: HttpRequest):
 
 
 def check_username(request: HttpRequest):
+    """
+    Check in real time update the if username is taken or available
+    """
     user_repo = CustomUserRepo
     if request.method == "POST":
         username = request.POST.get("username")
