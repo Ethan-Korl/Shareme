@@ -1,42 +1,46 @@
-from django.http import HttpRequest
-from django.shortcuts import render
-from rest_framework.generics import CreateAPIView
-from core.models import Channel
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from asgiref.sync import async_to_sync
-# Create your views here.
+from core.views.base import *
+
 
 @login_required()
 def dashboard(request: HttpRequest):
-    channels = Channel.objects.filter(user=request.user).all()
-    context = {
-        "user":request.user,
-        "channels":channels
-    }
+    channel_repo = ChannelRepository
+    channels = channel_repo.get_channels_user(user=request.user)
+    context = {"user": request.user, "channels": channels}
     return render(request, "dashboard.html", context)
 
 
-def delete_channel(request: HttpRequest):
-    pass
+@require_http_methods(["DELETE"])
+def delete_channel(request: HttpRequest, id):
+    channel_repo = ChannelRepository
+    result = channel_repo.delete_channel(id)
+    if result:
+        return
+    else:
+        return ""
 
 
 @login_required()
-@require_http_methods(['POST'])
+@require_http_methods(["POST"])
 def create_channel(request: HttpRequest):
-    request.headers["HX-Target"] = ""
+    channel_repo = ChannelRepository
 
-    channel_layer = get_channel_layer()
+    channel_name = request.POST.get("channel_name")
 
-    async_to_sync(channel_layer.group_send)(
-        f'update_channels', 
-        # 'shre',
-        {
-            'type': 'share_file',
-        }
+    channel = channel_repo.create_channel(
+        channel_name=channel_name,
+        user=request.user,
     )
-    return 
 
 
+#     request.headers["HX-Target"] = ""
 
+#     channel_layer = get_channel_layer()
 
+#     async_to_sync(channel_layer.group_send)(
+#         f'update_channels',
+#         # 'shre',
+#         {
+#             'type': 'share_file',
+#         }
+#     )
+#     return

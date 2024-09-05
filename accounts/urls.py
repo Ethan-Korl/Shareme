@@ -1,13 +1,14 @@
-from os import name
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .views import RequestOtpLogin , SignUpView
+from accounts.views import *
+
+app_name = "accounts"
 
 # urlpatterns = []
 urlpatterns = [
-    path("otp/", RequestOtpLogin.as_view(), name="register"),
+    # path("otp/", RequestOtpLogin.as_view(), name="register"),
     # path("verify-email/", VerifyEmailCode.as_view(), name="verify-email"),
-    path("signup/",SignUpView.as_view(),name="signup"),
-    path("login/", TokenObtainPairView.as_view(), name="obtaine-token"),
+    path("signup/", signup, name="signup"),
+    path("login/", login, name="login"),
+    path("auth/<username>/", verify_otp, name="verify-otp"),
     # path("reset-password/", ResetPasswordChange.as_view()),
-] 
+]

@@ -1,4 +1,4 @@
 from django.urls import path
+from core.views import *
 
-
-urlpatterns = []
+DASHBOARD_URLS = [path("dashboard/", dashboard, name="dashboard")]
