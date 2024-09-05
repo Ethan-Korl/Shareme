@@ -1,4 +1,4 @@
-from core.models import Channel
+from engine.models import Channel
 
 
 class ChannelRepository:

@@ -3,6 +3,7 @@ from django.http import HttpRequest
 from django.http import HttpRequest
 from django.shortcuts import render
 from rest_framework.generics import CreateAPIView
+from engine.models import Channel
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from asgiref.sync import async_to_sync
